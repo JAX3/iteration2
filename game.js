@@ -161,8 +161,7 @@ class playGame extends Phaser.Scene {
         // reusing platforms out of view.
         let minDistance = game.config.width;
         //▼▼▼▼casuing a ton of errors▼▼▼▼
-        this.platformGroup.getChildren().forEach
-            (function (platform) {
+       this.platformGroup.getChildren().forEach(function (platform) {
             let platformDistance = game.config.width - platform.x - platform.displayWidth / 2;
             minDistance = Math.min(minDistance, platformDistance);
             if (platform.x < - platform.displayWidth / 2) {

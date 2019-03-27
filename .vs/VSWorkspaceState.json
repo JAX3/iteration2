@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\assets"
   ],
-  "SelectedNode": "\\timer .txt",
+  "SelectedNode": "\\noise.js",
   "PreviewInSolutionExplorer": false
 }
