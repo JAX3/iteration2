@@ -1,6 +1,6 @@
-let game;
-    /* var noise_generator = new Simple1DNoise();
-        noise_generator.get(10);*/
+﻿let game;
+ const noise_generator = new Simple1DNoise();
+var gameOver = false;
 var score = 0;
 var scoreText;
 
@@ -17,14 +17,14 @@ let gameOptions = {
     jumps: 3
 }
 
-window.onload = function() {
+window.onload = function () {
 
     // object containing configuration options
     let gameConfig = {
         type: Phaser.AUTO,
         width: 1334,
         height: 750,
-        scene: playGame,
+        scene: [playGame, uiScene],
         backgroundColor: 0x444444,
 
         // physics settings
@@ -50,39 +50,21 @@ class playGame extends Phaser.Scene {
     constructor() {
         super("PlayGame")
 
-        
+
     }
     preload() {
-        this.load.image("platform", "assets/platform.png");
-        this.load.image("player", "assets/player.png");
-        this.load.image("alien","asset/alien.png");
-      
+        this.load.image('platform', 'assets/platform.png');
+        this.load.image('player', 'assets/player.png');
+        this.load.image('alien', 'asset/alien.png');
+
     }
     create() {
-      
-
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' }).setScrollFactor(0);
-   alien = this.physics.add.group({
-        key: 'alien',
-        repeat: 31,
-        setXY: { x: 25, y: 0, stepX: 100 }
-    });
-    alien.children.iterate(function (child) {
-
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    });
-this.physics.add.collider(alien ,platform);
-    
 
 
-
-
-
-
-
-
-
+        // create score text and anchor by setting scroll factor
+        scoreText = this.add.text(0, 32, 'Score = 0', { fontFamily: 'Arial', fontSize: '24px', fill: '#000' });
+        scoreText.x = game.config.width - (64 + scoreText.width)
+        scoreText.setScrollFactor(0, 0);
 
 
 
@@ -108,11 +90,13 @@ this.physics.add.collider(alien ,platform);
             }
         });
 
+
         // number of consecutive jumps made by the player
         this.playerJumps = 1;
 
         // adding a platform to the game, the arguments are platform width and x position
         this.addPlatform(game.config.width, game.config.width / 2);
+      //noise_generator.get(this.addPlatform);
 
         // adding the player;
         this.player = this.physics.add.sprite(gameOptions.playerStartPosition, game.config.height / 2, "player");
@@ -123,14 +107,11 @@ this.physics.add.collider(alien ,platform);
 
         // checking for input
         this.input.on("pointerdown", this.jump, this);
-        //##TODO
-		/*
-		*add mobile touch controls
-		*/
 
 
-
-
+        this.scene.launch('uiScene')
+        this.scene.pause();
+        // initalien.call(this);
     }
 
     // generating the platforms from the sprite location
@@ -164,23 +145,30 @@ this.physics.add.collider(alien ,platform);
         }
     }
     update() {
-       
-        // game over
-        if (this.player.y > game.config.height) {
-            this.scene.start("PlayGame");
 
-          
+        if (this.player.y > game.config.height) {
+            gameOver = true;
+            var uiScene = this.scene.get('uiScene')
+            console.log(uiScene)
+            uiScene.showRestart()
+           
+            this.scene.pause();
+            //  this.scene.start("PlayGame");
+
         }
         this.player.x = gameOptions.playerStartPosition;
 
         // reusing platforms out of view.
         let minDistance = game.config.width;
-        this.platformGroup.getChildren().forEach(function (platform) {
+        //▼▼▼▼casuing a ton of errors▼▼▼▼
+        this.platformGroup.getChildren().forEach
+            (function (platform) {
             let platformDistance = game.config.width - platform.x - platform.displayWidth / 2;
             minDistance = Math.min(minDistance, platformDistance);
             if (platform.x < - platform.displayWidth / 2) {
                 this.platformGroup.killAndHide(platform);
                 this.platformGroup.remove(platform);
+                return;
             }
         }, this);
 
@@ -188,26 +176,125 @@ this.physics.add.collider(alien ,platform);
         if (minDistance > this.nextPlatformDistance) {
             var nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
             this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
+            //this.addPlatform(noise_generator, nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
+            //noise_generator.get(this.addPlatform);
         }
 
 
     }
-
     
+       
+
 
 };
+
+
+
+
+class uiScene extends Phaser.Scene {
+    constructor() {
+        super('uiScene');
+    }
+
+    preload() {
+
+    }
+
+    create() {
+        // create start button - just text with background
+        var startButton = this.add.text(game.config.width / 2, game.config.height / 2, 'Start Game', { fontFamily: 'Arial', fontSize: '32px', backgroundColor: '#000', fill: '#FFF' });
+        // set z-index of start button so appears over everything else
+        startButton.setDepth(2);
+        startButton.x -= startButton.width / 2;
+        startButton.y -= startButton.height / 2;
+        // make start text interactive and listen to pointerdown event
+        startButton.setInteractive();
+        
+
+        startButton.on('pointerdown', function () {
+            this.scene.scene.resume('PlayGame');
+           
+
+
+            this.destroy(); // do this last
+        })
+
+        this.restartButton = this.add.text(game.config.width / 2, game.config.height / 2, 'Restart Game', { fontFamily: 'Arial', fontSize: '32px', backgroundColor: '#000', fill: '#FFF' });
+        this.restartButton.setDepth(2);
+        this.restartButton.setInteractive();
+        this.restartButton.x -= this.restartButton.width / 2;
+        this.restartButton.y -= this.restartButton.height / 2;
+        this.restartButton.on('pointerdown', function () {
+            // console.log(playGame);
+            this.scene.stop('PlayGame')
+            this.scene.start('PlayGame');
+            this.scene.stop(); // do this last
+            this.scene.pause();
+           this.restartButton.setActive(false);
+           this.restartButton.setVisible(false);
+        }, this)
+        this.restartButton.setActive(false);
+        this.restartButton.setVisible(false);
+    }
+    
+    update() {
+
+    }
+    showRestart() {
+        // create a restart button just like the start button
+        this.restartButton.setActive(true);
+        this.restartButton.setVisible(true);
+
+
+       
+
+    }
+
+
+}
+
+
+
+function initalien() {
+    score = 0; // initialise score
+    scoreText.text = 'Score = ' + score; // reset score text
+    // alien
+    var alienNum = 23;
+
+    alien = this.physics.add.group({ // distribute alien
+        key: 'alien',
+        repeat: alienNum,
+        setXY: { x: 16, y: 0, stepX: Math.floor(game.config.width / (alienNum + 1)) }
+    });
+    alien.children.iterate(function (child) {
+        child.setCollideWorldBounds(true); // otherwise alien will fall through the floor
+    });
+    this.physics.add.collider(alien, platform); // otherwise alien will fall through the box tiles
+    this.physics.add.overlap(player, alien, collectStar, null, this); // check for player collecting alien
+}
+
+
+function collectStar(player, star) {
+    // Removes the star from the screen
+    star.disableBody(true, true); // get rid of current star for now
+    //  Add and update the score
+    score += 10;
+    scoreText.text = 'Score = ' + score;
+
+}
+
 //basic resize of the game.
-function resize(){
+function resize() {
     let canvas = document.querySelector("canvas");
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
     let windowRatio = windowWidth / windowHeight;
     let gameRatio = game.config.width / game.config.height;
-    if(windowRatio < gameRatio){
+    if (windowRatio < gameRatio) {
         canvas.style.width = windowWidth + "px";
         canvas.style.height = (windowWidth / gameRatio) + "px";
     }
-    else{
+    else {
         canvas.style.width = (windowHeight * gameRatio) + "px";
         canvas.style.height = windowHeight + "px";
     }
