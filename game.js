@@ -64,7 +64,7 @@ class playGame extends Phaser.Scene {
    alien = this.physics.add.group({
         key: 'alien',
         repeat: 31,
-        setXY: { x: 25, y: 0, stepX: 50 }
+        setXY: { x: 25, y: 0, stepX: 100 }
     });
     alien.children.iterate(function (child) {
 
