@@ -1,5 +1,6 @@
 let game;
-
+    /* var noise_generator = new Simple1DNoise();
+        noise_generator.get(10);*/
 var score = 0;
 var scoreText;
 
