@@ -1,8 +1,7 @@
 ﻿let game;
  const noise_generator = new Simple1DNoise();
 var gameOver = false;
-var score = 0;
-var scoreText;
+
 
 //var s;
 
