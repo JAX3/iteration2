@@ -43,6 +43,16 @@ window.onload = function () {
     resize();
     window.addEventListener("resize", resize, false);
 }
+// TODO
+/* 
+ Coin generation
+ coin pool/group
+need to do scoring system.
+ 
+ 
+ 
+ 
+ */
 
 
 // playGame scene
@@ -76,8 +86,7 @@ class playGame extends Phaser.Scene {
                     platform.scene.platformGroup.add(platform)
                 }
             });
-
-
+   
             // number of consecutive jumps made by the player
             this.playerJumps = 1;
 
