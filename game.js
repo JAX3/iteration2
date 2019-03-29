@@ -55,18 +55,10 @@ class playGame extends Phaser.Scene {
     preload() {
         this.load.image('platform', 'assets/platform.png');
         this.load.image('player', 'assets/player.png');
-        this.load.image('alien', 'asset/alien.png');
+       
 
     }
     create() {
-
-
-        // create score text and anchor by setting scroll factor
-        scoreText = this.add.text(0, 32, 'Score = 0', { fontFamily: 'Arial', fontSize: '24px', fill: '#000' });
-        scoreText.x = game.config.width - (64 + scoreText.width)
-        scoreText.setScrollFactor(0, 0);
-
-
 
 
 
@@ -111,7 +103,7 @@ class playGame extends Phaser.Scene {
 
         this.scene.launch('uiScene')
         this.scene.pause();
-        // initalien.call(this);
+        
     }
 
     // generating the platforms from the sprite location
@@ -146,16 +138,7 @@ class playGame extends Phaser.Scene {
     }
     update() {
 
-        if (this.player.y > game.config.height) {
-            gameOver = true;
-            var uiScene = this.scene.get('uiScene')
-            console.log(uiScene)
-            uiScene.showRestart()
-           
-            this.scene.pause();
-            //  this.scene.start("PlayGame");
 
-        }
         this.player.x = gameOptions.playerStartPosition;
 
         // reusing platforms out of view.
@@ -183,7 +166,16 @@ class playGame extends Phaser.Scene {
     }
     
        
+  if (this.player.y > game.config.height) {
+            gameOver = true;
+            var uiScene = this.scene.get('uiScene')
+            console.log(uiScene)
+            uiScene.showRestart()
+           
+            this.scene.pause();
+            //  this.scene.start("PlayGame");
 
+        }
 
 };
 
@@ -228,7 +220,7 @@ class uiScene extends Phaser.Scene {
             this.scene.stop('PlayGame')
             this.scene.start('PlayGame');
             this.scene.stop(); // do this last
-            this.scene.pause();
+           // this.scene.pause();
            this.restartButton.setActive(false);
            this.restartButton.setVisible(false);
         }, this)
@@ -254,33 +246,7 @@ class uiScene extends Phaser.Scene {
 
 
 
-function initalien() {
-    score = 0; // initialise score
-    scoreText.text = 'Score = ' + score; // reset score text
-    // alien
-    var alienNum = 23;
 
-    alien = this.physics.add.group({ // distribute alien
-        key: 'alien',
-        repeat: alienNum,
-        setXY: { x: 16, y: 0, stepX: Math.floor(game.config.width / (alienNum + 1)) }
-    });
-    alien.children.iterate(function (child) {
-        child.setCollideWorldBounds(true); // otherwise alien will fall through the floor
-    });
-    this.physics.add.collider(alien, platform); // otherwise alien will fall through the box tiles
-    this.physics.add.overlap(player, alien, collectStar, null, this); // check for player collecting alien
-}
-
-
-function collectStar(player, star) {
-    // Removes the star from the screen
-    star.disableBody(true, true); // get rid of current star for now
-    //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score = ' + score;
-
-}
 
 //basic resize of the game.
 function resize() {
