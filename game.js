@@ -1,8 +1,7 @@
 ﻿let game;
- const noise_generator = new Simple1DNoise();
+// var noise_generator = new Simple1DNoise();
 var gameOver = false;
-var score = 0;
-var scoreText;
+var uiSceneStarted = false;
 
 //var s;
 
@@ -37,12 +36,6 @@ window.onload = function () {
     resize();
     window.addEventListener("resize", resize, false);
 }
-//noise generator
-/* 
-* need to do more research on it.
-* only found p5.js for perlin noise.
-*
-*/
 
 
 // playGame scene
@@ -61,12 +54,7 @@ class playGame extends Phaser.Scene {
     create() {
 
 
-        // create score text and anchor by setting scroll factor
-        scoreText = this.add.text(0, 32, 'Score = 0', { fontFamily: 'Arial', fontSize: '24px', fill: '#000' });
-        scoreText.x = game.config.width - (64 + scoreText.width)
-        scoreText.setScrollFactor(0, 0);
-
-
+        
 
 
 
@@ -108,10 +96,14 @@ class playGame extends Phaser.Scene {
         // checking for input
         this.input.on("pointerdown", this.jump, this);
 
-
-        this.scene.launch('uiScene')
+        if (!uiSceneStarted) {
+            this.scene.launch('uiScene')
+        }
+        
+        
+        
         this.scene.pause();
-        // initalien.call(this);
+       
     }
 
     // generating the platforms from the sprite location
@@ -145,23 +137,14 @@ class playGame extends Phaser.Scene {
         }
     }
     update() {
-
-        if (this.player.y > game.config.height) {
-            gameOver = true;
-            var uiScene = this.scene.get('uiScene')
-            console.log(uiScene)
-            uiScene.showRestart()
-           
-            this.scene.pause();
-            //  this.scene.start("PlayGame");
-
-        }
+        console.log(this.player.y)
+        
         this.player.x = gameOptions.playerStartPosition;
 
         // reusing platforms out of view.
         let minDistance = game.config.width;
         //▼▼▼▼casuing a ton of errors▼▼▼▼
-       this.platformGroup.getChildren().forEach(function (platform) {
+        this.platformGroup.getChildren().forEach(function (platform) {
             let platformDistance = game.config.width - platform.x - platform.displayWidth / 2;
             minDistance = Math.min(minDistance, platformDistance);
             if (platform.x < - platform.displayWidth / 2) {
@@ -174,12 +157,22 @@ class playGame extends Phaser.Scene {
         // adding new platforms
         if (minDistance > this.nextPlatformDistance) {
             var nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
+       
             this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
-            //this.addPlatform(noise_generator, nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
-            //noise_generator.get(this.addPlatform);
+            // noise_generator.get(this.addPlatform);
+            //this.noise_generator = new Simple1DNoise(this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2));
         }
+        
+        if (this.player.y > game.config.height) {
+            var uiScene = this.scene.get('uiScene')
+            
+            this.player.y = 0;
+            this.scene.pause();
+            uiScene.showRestart()
+            //  this.scene.start("PlayGame");
 
-
+        }
+       
     }
     
        
@@ -208,11 +201,11 @@ class uiScene extends Phaser.Scene {
         startButton.y -= startButton.height / 2;
         // make start text interactive and listen to pointerdown event
         startButton.setInteractive();
-        
+
 
         startButton.on('pointerdown', function () {
             this.scene.scene.resume('PlayGame');
-           
+
 
 
             this.destroy(); // do this last
@@ -225,15 +218,17 @@ class uiScene extends Phaser.Scene {
         this.restartButton.y -= this.restartButton.height / 2;
         this.restartButton.on('pointerdown', function () {
             // console.log(playGame);
-            this.scene.stop('PlayGame')
+            console.log("hi?")
             this.scene.start('PlayGame');
-            this.scene.stop(); // do this last
-            this.scene.pause();
-           this.restartButton.setActive(false);
-           this.restartButton.setVisible(false);
+            // this.scene.stop(); // do this last
+
+            this.restartButton.setActive(false);
+            this.restartButton.setVisible(false);
         }, this)
         this.restartButton.setActive(false);
         this.restartButton.setVisible(false);
+
+        uiSceneStarted = true;
     }
     
     update() {
@@ -241,6 +236,8 @@ class uiScene extends Phaser.Scene {
     }
     showRestart() {
         // create a restart button just like the start button
+        console.log("huh?")
+        this.scene.pause('PlayGame');
         this.restartButton.setActive(true);
         this.restartButton.setVisible(true);
 
@@ -254,33 +251,7 @@ class uiScene extends Phaser.Scene {
 
 
 
-function initalien() {
-    score = 0; // initialise score
-    scoreText.text = 'Score = ' + score; // reset score text
-    // alien
-    var alienNum = 23;
 
-    alien = this.physics.add.group({ // distribute alien
-        key: 'alien',
-        repeat: alienNum,
-        setXY: { x: 16, y: 0, stepX: Math.floor(game.config.width / (alienNum + 1)) }
-    });
-    alien.children.iterate(function (child) {
-        child.setCollideWorldBounds(true); // otherwise alien will fall through the floor
-    });
-    this.physics.add.collider(alien, platform); // otherwise alien will fall through the box tiles
-    this.physics.add.overlap(player, alien, collectStar, null, this); // check for player collecting alien
-}
-
-
-function collectStar(player, star) {
-    // Removes the star from the screen
-    star.disableBody(true, true); // get rid of current star for now
-    //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score = ' + score;
-
-}
 
 //basic resize of the game.
 function resize() {
