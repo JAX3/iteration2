@@ -1,5 +1,5 @@
 ﻿let game;
- var noise_generator = new Simple1DNoise();
+
 var gameOver = false;
 var uiSceneStarted = false;
 
@@ -176,7 +176,6 @@ class playGame extends Phaser.Scene {
         }, this);
 
         // adding new platforms
-        // adding new platforms
         if (minDistance > this.nextPlatformDistance) {
             let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
             let platformRandomHeight = gameOptions.platformHeighScale * Phaser.Math.Between(gameOptions.platformHeightRange[0], gameOptions.platformHeightRange[1]);
@@ -197,9 +196,9 @@ class playGame extends Phaser.Scene {
             
             this.player.y = gameOptions.playerStartPosition + 180;
      
-            this.scene.pause();
+           this.scene.restart();
             //platforms.call(this.scene.playGame);
-            uiScene.showRestart()
+            //uiScene.showRestart()
             //  this.scene.start("PlayGame");
 
         }
@@ -241,21 +240,21 @@ class uiScene extends Phaser.Scene {
             this.setVisible(false);
         })
 
-        this.restartButton = this.add.text(game.config.width / 2, game.config.height / 2, 'Restart Game', { fontFamily: 'Arial', fontSize: '32px', backgroundColor: '#000', fill: '#FFF' });
-        this.restartButton.setDepth(2);
-        this.restartButton.setInteractive();
-        this.restartButton.x -= this.restartButton.width / 2;
-        this.restartButton.y -= this.restartButton.height / 2;
-        this.restartButton.on('pointerdown', function () {
-            // console.log(playGame);
-            this.scene.restart('PlayGame');
-            // this.scene.stop(); // do this last
+        //this.restartButton = this.add.text(game.config.width / 2, game.config.height / 2, 'Restart Game', { fontFamily: 'Arial', fontSize: '32px', backgroundColor: '#000', fill: '#FFF' });
+        //this.restartButton.setDepth(2);
+        //this.restartButton.setInteractive();
+        //this.restartButton.x -= this.restartButton.width / 2;
+        //this.restartButton.y -= this.restartButton.height / 2;
+        //this.restartButton.on('pointerdown', function () {
+        //    // console.log(playGame);
+        //    this.scene.restart('PlayGame');
+        //    // this.scene.stop(); // do this last
 
-            this.restartButton.setActive(false);
-            this.restartButton.setVisible(false);
-        }, this)
-        this.restartButton.setActive(false);
-        this.restartButton.setVisible(false);
+        //    this.restartButton.setActive(false);
+        //    this.restartButton.setVisible(false);
+        //}, this)
+        //this.restartButton.setActive(false);
+        //this.restartButton.setVisible(false);
 
         uiSceneStarted = true;
     }
@@ -263,12 +262,12 @@ class uiScene extends Phaser.Scene {
     update() {
 
     }
-    showRestart() {
-        // create a restart button just like the start button
-        this.scene.pause('PlayGame');
-        this.restartButton.setActive(true);
-        this.restartButton.setVisible(true);
-    }
+    //showRestart() {
+    //    // create a restart button just like the start button
+    //    this.scene.pause('PlayGame');
+    //    this.restartButton.setActive(true);
+    //    this.restartButton.setVisible(true);
+    //}
 
 
 }
